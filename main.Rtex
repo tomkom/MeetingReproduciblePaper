@@ -1,0 +1,125 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[colorinlistoftodos]{todonotes}
+\newcommand{\supervisor}{\todo[author=Supervisor, color=pink,inline]}
+\newcommand{\student}{\todo[author=Student, color=orange,inline]}
+
+
+\title{MeetingReproduciblePaper}
+\author{martin.tomko }
+\date{May 2018}
+
+ 
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This document introduces basic steps for reproducible research with Overleaf v2 (knitr) and R.
+
+\subsection{Steps}
+Basic demo steps:
+
+\paragraph{Step 1 -- Student:}
+\begin{enumerate}
+\item Log in to Overleaf v2: \url{https://v2.overleaf.com/}
+\item Create a knitr project by cloning an example from \url{https://v2.overleaf.com/learn/Knitr#Plots}
+\item Compile and explore. YOuy can also start from a blank project, or any \LaTeX project, but if the file does not have a .Rtex extension, change the extension. Check the Overleaf documentation for \emph{knitting} (this is using knitr as a processing workflow).
+\item Share Overleaf link with supervisor
+\end{enumerate}
+
+\paragraph{Step 2 -- Supervisor:}
+Following on the first step, the supervisor:
+\begin{enumerate}
+    \item Logs into v2
+    \item Gets the project
+    \item Can use todonotes or edits directly, or use the Overleaf review function (top right) \supervisor{I do not like this}\student{but this is correct!}
+\end{enumerate}
+
+\paragraph{Step 3+ -- Student:}
+This process is only the start. The student then:
+\begin{enumerate}
+    \item Add an code subfolder, a fig subfolder, a data subfolder;
+    \item Clones the project using Git. It requires GIT setup. Do not forget to generate and add a ssh key (\textbf{the public one!}) to Github. You need to check how to activate the student github account;
+    \item Sends the git ssh clone url to the supervisor;
+    \item Adds R code into the subfolder, modifies Rtex, etc.
+    \item Adds the files, commits and pushes. This requires:
+    \begin{enumerate}
+        \item Edit your \verb+.gitignore+ files, to avoid committing large files and compiled content (such a pdfs). This is optional, but allows to remove some files from consideration. Check \url{https://www.atlassian.com/git/tutorials/saving-changes/gitignore#git-ignore-patterns} and  \url{https://www.atlassian.com/git/tutorials/saving-changes/gitignore#shared};
+        \item \verb+git add .+ This adds the files to add in your commit
+        \item \verb+git commit -am "Message about your commit"+. This adds what you have done to a queue. For instance, good to do aafter every significant edit to a pragraph, or code function. This is the minimal step back.
+        \item \verb+git push+ Pushes the edits to remote.
+    \end{enumerate}
+5. Push fails, as behind
+6. MT pulls again, and gets the updated Rtex file
+7. Commits and pushes to Overleaf  
+\end{enumerate}
+
+
+
+You can type R commands in your \LaTeX{} document and they will be properly run and the output printed in the document.
+ 
+<<>>=
+# Create a sequence of numbers
+X = 2:10
+ 
+# Display basic statistical measures
+summary(X)
+@
+
+<<label="mycode">>=
+read_chunk{"gini.R"}
+@
+
+
+<<plot1, fig.pos="t", fig.height=4, fig.width=4, fig.cap="First plot">>=
+ 
+data <- data.frame(
+    X = sample(1:100),
+    Y = sample(c("yes", "no"), 10, replace = TRUE)
+)
+ 
+plot(data$X, main="ShareLaTeX plot", xlab="Data")
+@
+ 
+The figure \ref{fig:plot1} is simple histogram.
+
+\section{Reading R From external files}
+We can get a source of the R as well:
+<<label="My data listing", eval=TRUE>>=
+
+environment<-toLatex(sessionInfo(), locale = FALSE)
+@
+
+%\section{Hidden: Used packages}
+<<label='Create References', eval=TRUE, echo=FALSE,  message=FALSE>>=
+require(knitr) # Needed for write_bib()
+
+# Load some packages to the session:
+require(xtable)
+require(ggplot2)
+
+# Select packages to cite:
+citPkgs <- names(sessionInfo()$otherPkgs)
+# Write the bibtex file:
+write_bib(citPkgs, file="R-bib.bib")
+@
+
+\section{Environment info}
+<<label="Environment info", eval=TRUE, echo=FALSE>>=
+environment<-toLatex(sessionInfo(), locale = FALSE)
+@
+
+This is the environment used:\\
+\Sexpr{environment}
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{references.bib,R-bib.bib}
+
+
+\end{document}
